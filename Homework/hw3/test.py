@@ -10,15 +10,15 @@ from amino_acids import aa, codons
 #mylist = range(0,21)
 
 #values = dict(zip(mylist, codons))
-codonlookup = dict(zip(codons, aa))
-print codonlookup
-#def reverse_codonlookup(d , v):
-#    for k in d:
-#        if d[k] == v:
-#            return k
-#    raise ValueError
-#
-#reverse_codonlookup(codonlookup,'TGG')
+codonlookup = dict(zip(aa, codons))
+#print codonlookup
+def reverse_codonlookup(d , v):
+    for k in d:
+        if v in d[k]:
+            return k
+    raise ValueError
+
+#print reverse_codonlookup(codonlookup,'TGG')
 
 #index = 0
 #while index < len(dna):
@@ -32,22 +32,24 @@ print codonlookup
 #    index = index + 3
 
 #
-#def testcoding_strand_to_AA(dna):
-#    """ Computes the Protein encoded by a sequence of DNA.  This function
-#        does not check for start and stop codons (it assumes that the input
-#        DNA sequence represents an protein coding region).
-#        
-#        dna: a DNA sequence represented as a string
-#        returns: a string containing the sequence of amino acids encoded by the
-#                 the input DNA fragment
-#    """
-#    index = 0
-#    while index < len(dna):
-#        codon = dna[index+3]
-#        print codonlookup[codon],
-#        index = index + 3
-#
-#testcoding_strand_to_AA('FW')
+def testcoding_strand_to_AA(dna):
+    """ Computes the Protein encoded by a sequence of DNA.  This function
+        does not check for start and stop codons (it assumes that the input
+        DNA sequence represents an protein coding region).
+        
+        dna: a DNA sequence represented as a string
+        returns: a string containing the sequence of amino acids encoded by the
+                 the input DNA fragment
+    """
+    index = 0
+    while index < len(dna):
+        codon = dna[index+2]
+        for k in codonlookup:
+            if codon in codonlookup[k]:
+                return k
+        index = index + 3
+
+print testcoding_strand_to_AA('TGGGAA')
 
 
 #def histogram(s):
