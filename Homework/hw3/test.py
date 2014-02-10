@@ -18,7 +18,7 @@ def reverse_codonlookup(d , v):
             return k
     raise ValueError
 
-#print reverse_codonlookup(codonlookup,'TGG')
+print reverse_codonlookup(codonlookup,'TGG')
 
 #index = 0
 #while index < len(dna):
@@ -43,7 +43,7 @@ def testcoding_strand_to_AA(dna):
     """
     index = 0
     while index < len(dna):
-        codon = dna[index+2]
+        codon = dna[index + 2]
         for k in codonlookup:
             if codon in codonlookup[k]:
                 return k

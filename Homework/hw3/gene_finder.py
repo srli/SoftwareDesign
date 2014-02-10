@@ -7,6 +7,7 @@ Created on Sun Feb  2 11:24:42 2014
 
 # you may find it useful to import these variables (although you are not required to use them)
 from amino_acids import aa, codons
+codonlookup = dict(zip(aa, codons)) #creates dictionary mapping AA to condons
 
 def collapse(L):
     """ Converts a list of strings to a string by concatenating all elements of the list """
@@ -15,7 +16,12 @@ def collapse(L):
     for s in L:
         output = output + s
     return output
-
+#
+#def reverse_codonlookup(d , v):
+#    for k in d:
+#        if v in d[k]:
+#            return k
+#    raise ValueError
 
 def coding_strand_to_AA(dna):
     """ Computes the Protein encoded by a sequence of DNA.  This function
@@ -28,50 +34,63 @@ def coding_strand_to_AA(dna):
     """
     index = 0
     while index < len(dna):
-        codon = dna[index]
-        if codon == 'TTT' or 'TTC':
-            print 'F'
-        elif codon == 'TTA' or 'TTG' or 'CTT' or 'CTC' or 'CTA' or 'CTG':
-            print 'L'
-        else:
-            print 'J'
+        codon = dna[index:index+3]
+        for k in codonlookup:
+            if codon in codonlookup[k]:
+                return k
         index = index + 3
-    
-    
-    collapse(dna)
-    
+        #print codon
+        
+print coding_strand_to_AA('AAAATGCGAAAA')
 
 #def coding_strand_to_AA_unit_tests():
 #    """ Unit tests for the coding_strand_to_AA function """
-#        
+#    n = raw_input("Please input DNA strand:    ")
+#    coding_strand_to_AA(n)
+#    print 'input:   ', n, "expected output:    ", expected, "actual output:    "
 #    # YOUR IMPLEMENTATION HERE
-#
-#def get_reverse_complement(dna):
-#    """ Computes the reverse complementary sequence of DNA for the specfied DNA
-#        sequence
-#    
-#        dna: a DNA sequence represented as a string
-#        returns: the reverse complementary DNA sequence represented as a string
-#    """
-#    
-#    # YOUR IMPLEMENTATION HERE
-#    
+
+def get_reverse_complement(dna):
+    """ Computes the reverse complementary sequence of DNA for the specfied DNA
+        sequence
+    
+        dna: a DNA sequence represented as a string
+        returns: the reverse complementary DNA sequence represented as a string
+    """
+    index = 0
+    while index < len(dna):
+        N = dna[index]
+        if N == 'A':
+            print 'T',
+        elif N == 'T':
+            print 'A',
+        elif N == 'G':
+            print 'C',
+        elif N == 'C':
+            print 'G',
+        else:
+            print "That's not a base!"
+        index = index + 1
+
+get_reverse_complement('AATGAAG')
+    
 #def get_reverse_complement_unit_tests():
 #    """ Unit tests for the get_complement function """
 #        
 #    # YOUR IMPLEMENTATION HERE    
 #
-#def rest_of_ORF(dna):
-#    """ Takes a DNA sequence that is assumed to begin with a start codon and returns
-#        the sequence up to but not including the first in frame stop codon.  If there
-#        is no in frame stop codon, returns the whole string.
-#        
-#        dna: a DNA sequence
-#        returns: the open reading frame represented as a string
-#    """
-#    
-#    # YOUR IMPLEMENTATION HERE
-#
+def rest_of_ORF(dna):
+    """ Takes a DNA sequence that is assumed to begin with a start codon and returns
+        the sequence up to but not including the first in frame stop codon.  If there
+        is no in frame stop codon, returns the whole string.
+        
+        dna: a DNA sequence
+        returns: the open reading frame represented as a string
+    """
+    
+    # YOUR IMPLEMENTATION HERE
+
+
 #def rest_of_ORF_unit_tests():
 #    """ Unit tests for the rest_of_ORF function """
 #        
