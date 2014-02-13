@@ -2,11 +2,15 @@
 """
 Created on Sun Feb  2 11:24:42 2014
 
-@author: Sophie
+@author: Sophie 
+why is this so hard lol ;___;
 """
 
-# you may find it useful to import these variables (although you are not required to use them)
 from amino_acids import aa, codons
+from load import load_seq
+from random import shuffle
+
+dna = load_seq("./data/X73525.fa")
 codonlookup = dict(zip(aa, codons)) #creates dictionary mapping AA to condons
 
 def collapse(L):
@@ -16,12 +20,6 @@ def collapse(L):
     for s in L:
         output = output + s
     return output
-#
-#def reverse_codonlookup(d , v):
-#    for k in d:
-#        if v in d[k]:
-#            return k
-#    raise ValueError
 
 def coding_strand_to_AA(dna):
     """ Computes the Protein encoded by a sequence of DNA.  This function
@@ -33,22 +31,20 @@ def coding_strand_to_AA(dna):
                  the input DNA fragment
     """
     index = 0
+    res = []
     while index < len(dna):
         codon = dna[index:index+3]
         for k in codonlookup:
             if codon in codonlookup[k]:
-                return k
-        index = index + 3
-        #print codon
+                res.append(k)
+        index += 3
+    return collapse(res) #collapse at end of most functions to make strings, not lists
         
-print coding_strand_to_AA('AAAATGCGAAAA')
-
-#def coding_strand_to_AA_unit_tests():
-#    """ Unit tests for the coding_strand_to_AA function """
-#    n = raw_input("Please input DNA strand:    ")
-#    coding_strand_to_AA(n)
-#    print 'input:   ', n, "expected output:    ", expected, "actual output:    "
-#    # YOUR IMPLEMENTATION HERE
+def coding_strand_to_AA_unit_tests (my_input, expected_output):
+    """ Unit tests for the coding_strand_to_AA function """
+    print 'Translates a codon to an amino acid'
+    print 'input:', my_input, "expected output:", expected_output,"actual output:", coding_strand_to_AA(my_input)
+    print '    '
 
 def get_reverse_complement(dna):
     """ Computes the reverse complementary sequence of DNA for the specfied DNA
@@ -58,27 +54,29 @@ def get_reverse_complement(dna):
         returns: the reverse complementary DNA sequence represented as a string
     """
     index = 0
+    res = []
     while index < len(dna):
         N = dna[index]
+        
         if N == 'A':
-            print 'T',
+            res.append('T')            
         elif N == 'T':
-            print 'A',
+            res.append('A')
         elif N == 'G':
-            print 'C',
+            res.append('C')
         elif N == 'C':
-            print 'G',
+            res.append('G')
         else:
-            print "That's not a base!"
-        index = index + 1
+            print "If you see me you messed something up really badly. ):"
+        index += 1
+    return collapse(res[::-1]) #Reverses this nucleotide chain
 
-get_reverse_complement('AATGAAG')
-    
-#def get_reverse_complement_unit_tests():
-#    """ Unit tests for the get_complement function """
-#        
-#    # YOUR IMPLEMENTATION HERE    
-#
+def get_reverse_complement_unit_tests(my_input, expected_output):
+    """ Unit tests for the get_complement function """
+    print 'Finds complementary nucleotides'
+    print 'input:', my_input, "expected output:", expected_output,"actual output:", get_reverse_complement(my_input)
+    print '   '
+
 def rest_of_ORF(dna):
     """ Takes a DNA sequence that is assumed to begin with a start codon and returns
         the sequence up to but not including the first in frame stop codon.  If there
@@ -87,95 +85,150 @@ def rest_of_ORF(dna):
         dna: a DNA sequence
         returns: the open reading frame represented as a string
     """
+    index = 0
+    while index < len(dna):
+        codon = dna[index:index+3]
+        index += 3
+        if codon in ['TAG','TAA','TGA']:
+            return dna[0:index-3]
+    return dna
+
+def rest_of_ORF_unit_tests(my_input ,expected_output): 
+    """ Unit tests for the rest_of_ORF function """
+    print 'Returns snippet of DNA up to, but not including stop codon'
+    print 'input:', my_input, "expected output:", expected_output,"actual output:", rest_of_ORF(my_input)
+    print '    '
     
-    # YOUR IMPLEMENTATION HERE
+def find_all_ORFs_oneframe(dna):
+    """ Finds all non-nested open reading frames in the given DNA sequence and returns
+        them as a list.  This function should only find ORFs that are in the default
+        frame of the sequence (i.e. they start on indices that are multiples of 3).
+        By non-nested we mean that if an ORF occurs entirely within
+        another ORF, it should not be included in the returned list of ORFs.
+        
+        dna: a DNA sequence
+        returns: a list of non-nested ORFs
+    """
+    index = 0
+    res = []
+    while index < len(dna):
+        codon=dna[index:index + 3]
+        if codon == "ATG":
+            res.append(rest_of_ORF(dna[index:]))
+            index += len(res[-1]) #Lists are cyclic, this returns last value of list
+        else:
+            index += 3
+    return res
+    
+  
+def find_all_ORFs_oneframe_unit_tests(my_input, expected_output):
+    """ Unit tests for the find_all_ORFs_oneframe function """
+    print 'Finds all ORFs within one reading frame'
+    print 'input:', my_input, "expected output:", expected_output,"actual output:", find_all_ORFs_oneframe(my_input)
+    print '    '
 
+def find_all_ORFs(dna):
+    """ Finds all non-nested open reading frames in the given DNA sequence in all 3
+        possible frames and returns them as a list.  By non-nested we mean that if an
+        ORF occurs entirely within another ORF and they are both in                                             the same frame,
+        it should not be included in the returned list of ORFs.
+        
+        dna: a DNA sequence
+        returns: a list of non-nested ORFs
+    """
+    res = []
+    p = 0
+    while p < 3:
+        dna_snippet = dna[p:len(dna)]
+        res.append(collapse(find_all_ORFs_oneframe(dna_snippet)))
+        p += 1
+    return res
 
-#def rest_of_ORF_unit_tests():
-#    """ Unit tests for the rest_of_ORF function """
-#        
-#    # YOUR IMPLEMENTATION HERE
-#        
-#def find_all_ORFs_oneframe(dna):
-#    """ Finds all non-nested open reading frames in the given DNA sequence and returns
-#        them as a list.  This function should only find ORFs that are in the default
-#        frame of the sequence (i.e. they start on indices that are multiples of 3).
-#        By non-nested we mean that if an ORF occurs entirely within
-#        another ORF, it should not be included in the returned list of ORFs.
-#        
-#        dna: a DNA sequence
-#        returns: a list of non-nested ORFs
-#    """
-#     
-#    # YOUR IMPLEMENTATION HERE        
-#     
-#def find_all_ORFs_oneframe_unit_tests():
-#    """ Unit tests for the find_all_ORFs_oneframe function """
-#
-#    # YOUR IMPLEMENTATION HERE
-#
-#def find_all_ORFs(dna):
-#    """ Finds all non-nested open reading frames in the given DNA sequence in all 3
-#        possible frames and returns them as a list.  By non-nested we mean that if an
-#        ORF occurs entirely within another ORF and they are both in the same frame,
-#        it should not be included in the returned list of ORFs.
-#        
-#        dna: a DNA sequence
-#        returns: a list of non-nested ORFs
-#    """
-#     
-#    # YOUR IMPLEMENTATION HERE
-#
-#def find_all_ORFs_unit_tests():
-#    """ Unit tests for the find_all_ORFs function """
-#        
-#    # YOUR IMPLEMENTATION HERE
-#
-#def find_all_ORFs_both_strands(dna):
-#    """ Finds all non-nested open reading frames in the given DNA sequence on both
-#        strands.
-#        
-#        dna: a DNA sequence
-#        returns: a list of non-nested ORFs
-#    """
-#     
-#    # YOUR IMPLEMENTATION HERE
-#
-#def find_all_ORFs_both_strands_unit_tests():
-#    """ Unit tests for the find_all_ORFs_both_strands function """
-#
-#    # YOUR IMPLEMENTATION HERE
-#
-#def longest_ORF(dna):
-#    """ Finds the longest ORF on both strands of the specified DNA and returns it
-#        as a string"""
-#
-#    # YOUR IMPLEMENTATION HERE
-#
-#def longest_ORF_unit_tests():
-#    """ Unit tests for the longest_ORF function """
-#
-#    # YOUR IMPLEMENTATION HERE
-#
-#def longest_ORF_noncoding(dna, num_trials):
-#    """ Computes the maximum length of the longest ORF over num_trials shuffles
+def find_all_ORFs_unit_tests(my_input, expected_output):
+    """ Unit tests for the find_all_ORFs function """
+    print 'Finds all ORFs within any of the 3 possible reading frames'
+    print 'input:', my_input, "expected output:", expected_output,"actual output:", find_all_ORFs(my_input)
+    print '    '
+      
+def find_all_ORFs_both_strands(dna):
+    """ Finds all non-nested open reading frames in the given DNA sequence on both
+        strands.
+        
+        dna: a DNA sequence
+        returns: a list of non-nested ORFs
+    """
+    res = []
+    dna_inverse = get_reverse_complement(dna)
+    res.append(collapse(find_all_ORFs(dna)))
+    res.append(collapse(find_all_ORFs(dna_inverse)))
+    return res
+
+def find_all_ORFs_both_strands_unit_tests(my_input, expected_output):
+    """ Unit tests for the find_all_ORFs_both_strands function """
+    print 'Finds all ORFs in both strands of DNA'
+    print 'input:', my_input, "expected output:", expected_output,"actual output:", find_all_ORFs_both_strands(my_input)
+    print '    '
+ 
+def longest_ORF(dna):
+    """ Finds the longest ORF on both strands of the specified DNA and returns it
+        as a string"""
+    return max(find_all_ORFs_both_strands(dna),key=len)
+
+def longest_ORF_unit_tests(my_input, expected_output):
+    """ Unit tests for the longest_ORF function """
+    print 'Returns longest ORF in both strands'
+    print 'input:', my_input, "expected output:", expected_output,"actual output:", longest_ORF(my_input)
+    print '    '
+    
+def longest_ORF_noncoding(dna, num_trials):
+    """ Computes the maximum length of the longest ORF over num_trials shuffles
 #        of the specfied DNA sequence
 #        
 #        dna: a DNA sequence
 #        num_trials: the number of random shuffles
 #        returns: the maximum length longest ORF """
-#
-#    # YOUR IMPLEMENTATION HERE
-#
-#def gene_finder(dna, threshold):
-#    """ Returns the amino acid sequences coded by all genes that have an ORF
-#        larger than the specified threshold.
-#        
-#        dna: a DNA sequence
-#        threshold: the minimum length of the ORF for it to be considered a valid
-#                   gene.
-#        returns: a list of all amino acid sequences whose ORFs meet the minimum
-#                 length specified.
-#    """
-#
-#    # YOUR IMPLEMENTATION HERE
+    i = 0
+    res = []
+    while i < num_trials:
+        dna_shuffle = list(dna)
+        shuffle(dna_shuffle)
+        dna_shuffle = ''.join(dna_shuffle)
+        res.append(len(longest_ORF(dna_shuffle))/9)
+        i += 1
+    return max(res)
+
+print longest_ORF_noncoding(dna,1500)
+
+def gene_finder(dna, threshold):
+    """ Returns the amino acid sequences coded by all genes that have an ORF
+        larger than the specified threshold.
+        
+        dna: a DNA sequence
+        threshold: the minimum length of the ORF for it to be considered a valid
+                   gene.
+        returns: a list of all amino acid sequences whose ORFs meet the minimum
+                 length specified.
+    """
+    ORFS = find_all_ORFs_both_strands(dna)
+    i = 0
+    res = []
+    while i < len(ORFS):
+        if len(ORFS[i]) > threshold:
+            res.append(coding_strand_to_AA(ORFS[i]))
+            i += 1
+        else:
+            i += 1
+    return res
+     
+print gene_finder(dna,720)
+
+#Debugging unit tests
+#Format is "Input", "Expected Output"
+if __name__=="__main__":
+    coding_strand_to_AA_unit_tests('ATGCCCGCTTT','MPA')
+    get_reverse_complement_unit_tests('ATGCCCGCTTT','AAAGCGGGCAT')
+    rest_of_ORF_unit_tests('ATGTGAA','ATG')
+    find_all_ORFs_oneframe_unit_tests('ATGCATGAATGTAGATAGATGTGCCC','ATGCATGAATGTAGA, ATGTGCCC')
+    find_all_ORFs_unit_tests('ATGCATGAATGTAG','ATGCATGAATGTAG, ATGAATGTAG, ATG')
+    find_all_ORFs_both_strands_unit_tests('ATGCGAATGTAGCATCAAA', 'ATGCGAATG, ATGCTACATTCGCAT')
+    longest_ORF_unit_tests('ATGCGAATGTAGCATCAAA','ATGCTACATTCGCAT')
