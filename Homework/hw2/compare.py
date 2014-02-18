@@ -16,5 +16,12 @@ if x > y:
     print '1'
 elif x == y:
     print 'No, not right'
-elif x < y:
+elif x < y:               # would have used else: 
     print '-1'
+
+'''
+Mostly the same comments as check_fermat.
+
+I personally would have used an else: statement
+for closure around the if statement.
+'''

@@ -60,3 +60,10 @@ def grid2():
     plus_row2()
     
 grid2()
+
+'''
+Nice! Could you generalize your twice and four
+functions to make a "do_n_times" function?
+
+What about for the other functions?
+'''
