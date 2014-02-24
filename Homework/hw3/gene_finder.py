@@ -11,6 +11,15 @@ from load import load_seq
 from random import shuffle
 
 dna = load_seq("./data/X73525.fa")
+'''
+excellent use of dictionary. However, this maps amino acids to the list of codons,
+hence it should be called "aalookup"
+
+With dictionaries, when you "look something up", you match a key to the value
+and doing that gives you a constant look up time. This is a more technical term than 
+you're used to now, but "key -> value" is the important concept you want to get
+out of this.
+'''
 codonlookup = dict(zip(aa, codons)) #creates dictionary mapping AA to condons
 
 def collapse(L):
@@ -67,7 +76,7 @@ def get_reverse_complement(dna):
         elif N == 'C':
             res.append('G')
         else:
-            print "If you see me you messed something up really badly. ):"
+            print "If you see me you messed something up really badly. ):"  # yay error catching! Look on the PR for more detailed comments
         index += 1
     return collapse(res[::-1]) #Reverses this nucleotide chain
 
@@ -88,6 +97,7 @@ def rest_of_ORF(dna):
     index = 0
     while index < len(dna):
         codon = dna[index:index+3]
+        # you shouldn't reset index until the end of the loop to mitigate (index-3) in later lines
         index += 3
         if codon in ['TAG','TAA','TGA']:
             return dna[0:index-3]
@@ -140,9 +150,17 @@ def find_all_ORFs(dna):
     p = 0
     while p < 3:
         dna_snippet = dna[p:len(dna)]
-        res.append(collapse(find_all_ORFs_oneframe(dna_snippet)))
+        res.append(collapse(find_all_ORFs_oneframe(dna_snippet)))   # this line is broken.
         p += 1
     return res
+
+'''
+If the result of your find_all_ORFs_oneframe(dna_snippet) is ['a', 'b', 'c'],
+find_all_ORFs(dna) will return ['abc'], which isn't what you want as your response.
+You want ['a', 'b', 'c', ...] where ... is the result of find_all_ORFs_oneframe() for other dna_snippets
+
+It's not so clear on here. I'll explain later if you want :-)
+'''
 
 def find_all_ORFs_unit_tests(my_input, expected_output):
     """ Unit tests for the find_all_ORFs function """
@@ -187,13 +205,14 @@ def longest_ORF_noncoding(dna, num_trials):
 #        dna: a DNA sequence
 #        num_trials: the number of random shuffles
 #        returns: the maximum length longest ORF """
+# why the weird commenting above?
     i = 0
     res = []
     while i < num_trials:
         dna_shuffle = list(dna)
         shuffle(dna_shuffle)
-        dna_shuffle = ''.join(dna_shuffle)
-        res.append(len(longest_ORF(dna_shuffle))/9)
+        dna_shuffle = ''.join(dna_shuffle)      # could have used collapse but I approve!
+        res.append(len(longest_ORF(dna_shuffle))/9)     # I think you want the length of the ORF not the amino acids..?
         i += 1
     return max(res)
 
