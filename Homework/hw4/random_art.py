@@ -15,8 +15,9 @@ def build_random_function(min_depth, max_depth):
     """Takes minimum function depth and maximum function depth as inputs, and 
     generates a function using a set of 7 "blocks".
     """
+    # could you have simply used func and randint to replace hello?
     hello = ['x','y']
-    func = ['x','y','cos_pi','sin_pi','prod','square','average']
+    func = ['x','y','cos_pi','sin_pi','prod','square','average']    # while it's not a big deal, square doesn't satisfy the necessity of input [-1,1] returning output of [-1,1]
     if max_depth == 1:
         return hello[randint(0,1)]
     else:
@@ -25,6 +26,14 @@ def build_random_function(min_depth, max_depth):
             return [block, build_random_function(min_depth-1, max_depth-1), build_random_function(min_depth-1, max_depth-1)]
         elif not block == 'prod':
            return [block, build_random_function(min_depth-1, max_depth-1)] 
+
+'''
+This function doesn't take into account the effects of min_depth.
+If my depth ranged from [1-5], I expect the output to range from ['x'] to [func[randint(2,6)], [func[randint(2,6)], [...]], ...]
+According to your function, the only output I would expect give a range of [1-5] are:
+    [func[randint(2,6)], [..., ..., ..., ['x']]]
+So in reality, this function has multiple base cases: when max_depth == 1 and when min_depth == 1
+'''
 
 def evaluate_random_function(f, x, y):
     """Takes function as input and a numerical value for x and y. 
@@ -60,7 +69,7 @@ def remap_interval(val, input_interval_start, input_interval_end, output_interva
                   max-min
     """
     output_interval = output_interval_end - output_interval_start
-    output_interval = float(output_interval)
+    output_interval = float(output_interval)        # output_interval = float(output_interval_end - output_interval_start)
     input_interval = input_interval_end-input_interval_start
     scaled_val = (output_interval*(val - input_interval_start)/(input_interval)) + output_interval_start
     return scaled_val
@@ -79,7 +88,7 @@ def create_image():
     
     for x in range(350): #alter this value depending on size of image
         #Changing x value to within -1 and 1 to work with functions
-        x_map = remap_interval(x,1,349,-1,1) 
+        x_map = remap_interval(x,1,349,-1,1)    # why from 1 - 349? I think it should be 0 - 349 (or 1-350)
         for y in range(350):
             y_map = remap_interval(y,1,349,-1,1)
             #each set of code creates a random color map for the color specified
