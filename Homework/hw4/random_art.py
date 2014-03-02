@@ -70,9 +70,9 @@ def create_image():
     based on previously defined functions. It will generate separate functions 
     and pixel values for each color channel and combine them in the final image.
     """
-    red_func =  build_random_function(2,4)
+    red_func =  build_random_function(2,6)
     blue_func = build_random_function(2,4)
-    green_func = build_random_function(2,4)
+    green_func = build_random_function(2,5)
     
     img = Image.new("RGB", (350,350)) #we designate size of image here
     pixels = img.load()
