@@ -3,6 +3,7 @@
 Created on Wed Feb 26 20:52:17 2014
 
 @author: sophie
+#graded
 """
 from pattern.en import *
 from pattern.web import *
